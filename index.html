@@ -27,6 +27,16 @@
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link href="css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
   <link href="css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <!-- RadarChart -->
+  <script src="js/Chart.bundle.js"></script>
+  <script src="js/utils.js"></script>
+  <style>
+    canvas {
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+    }
+  </style>
 </head>
 <body>
   <!--div class="navbar-fixed"-->
@@ -36,7 +46,7 @@
 	  <ul class="left hide-on-med-and-down">
 		<li><a href="#about">About</a></li>
 		<li><a href="#projects">Projects</a></li>
-        <li><a href="skills">Skills</a></li>
+        <li><a href="#skills">Skills</a></li>
 		  <!--DropDownTrigger-->
 		  <li><a class='dropdown-button btn' href '#' data-activates='dropdown1'>Info</a>
 		  <!--DropDownStructure-->
@@ -142,7 +152,7 @@
     </div>
     <div class="parallax"><img src="images/ContemporaryOffice.jpg" alt="Unsplashed background img 2"></div>
   </div>
-  
+  <!-- Project Section -->
 <div id="projects" div class="section scrollspy">
   <div class="container">
     <div class="section">
@@ -179,7 +189,27 @@
     </div>
     <div class="parallax"><img src="images/ContemporaryBed.jpg" alt="Unsplashed background img 3"></div>
   </div>
-
+<!-- Skills Section -->
+<div id="skills" div class="section scrollspy">
+  <div class="container">
+    <div class="section" style="text-align: center;">
+      <!--div class="container"-->
+        <!--div style="text-align: center;"-->
+          <!--h3><i class="mdi-content-send brown-text"></i></he-->
+          <h4>Skills Graph</h4>
+		  <hr>
+            	  	
+		<!--/div-->
+      <!--/div-->
+    </div>
+    <div class="row center">
+      <div style="text-align: right">
+        <canvas id="canvas" height="150"></canvas>
+      </div>	
+    </div>
+  </div>
+</div>  
+  
   <footer class="page-footer teal">
     <div class="container">
       <div class="row">
@@ -212,12 +242,121 @@
       </div>
 	</div>
   </footer>
+   
+  <script>
+    var randomScalingFactor = function() {
+        return Math.round(Math.random() * 100);
+    };
 
+    var color = Chart.helpers.color;
+    var config = {
+        type: 'radar',
+        data: {
+            labels: ["OOP", ["Data", "Structures"],"Java", "Python", "C#", "Html", "CSS", "JavaScript", ["Relational", "Database"]],
+            datasets: [{
+                label: "Skill Levels",
+                backgroundColor: color(window.chartColors.red).alpha(0.2).rgbString(),
+                borderColor: window.chartColors.red,
+                pointBackgroundColor: window.chartColors.red,
+                data: [
+                    80,
+                    70,
+                    75,
+                    70, 
+                    60, 
+                    50, 
+                    50, 
+                    50, 
+                    60,
+                ]
+            }]
+        },
+        options: {
+            legend: {
+                position: 'top',
+            },
+            title: {
+                display: false,
+                text: 'Skills Radar Chart'
+            },
+            scale: {
+              ticks: {
+                beginAtZero: true,
+                max: 100
+              }
+            }
+        }
+    };
+
+    window.onload = function() {
+        window.myRadar = new Chart(document.getElementById("canvas"), config);
+    };
+
+    document.getElementById('randomizeData').addEventListener('click', function() {
+        config.data.datasets.forEach(function(dataset) {
+            dataset.data = dataset.data.map(function() {
+                return randomScalingFactor();
+            });
+        });
+
+        window.myRadar.update();
+    });
+
+    var colorNames = Object.keys(window.chartColors);
+    document.getElementById('addDataset').addEventListener('click', function() {
+        var colorName = colorNames[config.data.datasets.length % colorNames.length];;
+        var newColor = window.chartColors[colorName];
+
+        var newDataset = {
+            label: 'Dataset ' + config.data.datasets.length,
+            borderColor: newColor,
+            backgroundColor: color(newColor).alpha(0.2).rgbString(),
+            pointBorderColor: newColor,
+            data: [],
+        };
+
+        for (var index = 0; index < config.data.labels.length; ++index) {
+            newDataset.data.push(randomScalingFactor());
+        }
+
+        config.data.datasets.push(newDataset);
+        window.myRadar.update();
+    });
+
+    document.getElementById('addData').addEventListener('click', function() {
+        if (config.data.datasets.length > 0) {
+            config.data.labels.push('dataset #' + config.data.labels.length);
+
+            config.data.datasets.forEach(function (dataset) {
+                dataset.data.push(randomScalingFactor());
+            });
+
+            window.myRadar.update();
+        }
+    });
+
+    document.getElementById('removeDataset').addEventListener('click', function() {
+        config.data.datasets.splice(0, 1);
+        window.myRadar.update();
+    });
+
+    document.getElementById('removeData').addEventListener('click', function() {
+        config.data.labels.pop(); // remove the label first
+
+        config.data.datasets.forEach(function(dataset) {
+            dataset.data.pop();
+        });
+
+        window.myRadar.update();
+    });
+    </script>
 
   <!--  Scripts-->
   <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
   <script src="js/materialize.js"></script>
   <script src="js/init.js"></script>
+  
+  <!--script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.js"--><!--/script-->
 
   </body>
 </html>
